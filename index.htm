@@ -10,6 +10,13 @@
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .emoji {
             font-size: 60px;
@@ -19,54 +26,164 @@
             font-size: 24px;
             margin: 20px;
             display: none;
+            color: #2ecc71;
         }
         button {
             font-size: 18px;
             padding: 10px 20px;
             margin: 10px;
             cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
         }
         .progress {
             margin-top: 20px;
             color: #666;
         }
+        .category-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 20px;
+        }
+        .category-nav {
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Emoji Quiz</h1>
-    <div class="emoji" id="emojiDisplay"></div>
-    <div class="answer" id="answerDisplay"></div>
-    <div>
-        <button onclick="showAnswer()">Show Answer</button>
-        <button onclick="nextQuestion()">Next Question</button>
+    <div class="container">
+        <h1>Emoji Quiz</h1>
+        <div class="category-nav">
+            <button onclick="prevCategory()">← Category</button>
+            <span class="category-title" id="categoryTitle"></span>
+            <button onclick="nextCategory()">Category →</button>
+        </div>
+        <div class="emoji" id="emojiDisplay"></div>
+        <div class="answer" id="answerDisplay"></div>
+        <div>
+            <button onclick="showAnswer()">Show Answer</button>
+            <button onclick="nextQuestion()">Next Question</button>
+        </div>
+        <div class="progress" id="progress"></div>
     </div>
-    <div class="progress" id="progress"></div>
 
     <script>
-        const questions = [
-            { emoji: "🦁👑", answer: "The Lion King" },
-            { emoji: "👻👻👻🔫", answer: "Ghostbusters" },
-            { emoji: "🚢❄️💔", answer: "Titanic" },
-            { emoji: "🧙‍♂️💍🌋", answer: "Lord of the Rings" },
-            { emoji: "🦖🏝️🚙", answer: "Jurassic Park" }
+        const categories = [
+            {
+                name: "Movies 🎬",
+                questions: [
+                    { emoji: "🦁👑", answer: "The Lion King" },
+                    { emoji: "👻👻👻🔫", answer: "Ghostbusters" },
+                    { emoji: "🚢❄️💔", answer: "Titanic" },
+                    { emoji: "🧙‍♂️💍🌋", answer: "Lord of the Rings" },
+                    { emoji: "🦖🏝️🚙", answer: "Jurassic Park" },
+                    { emoji: "🤖❤️🤖‍♀️", answer: "Wall-E" },
+                    { emoji: "🧜‍♀️🐠🌊", answer: "The Little Mermaid" },
+                    { emoji: "🏰🌹👧", answer: "Beauty and the Beast" },
+                    { emoji: "🎪🐘✈️", answer: "Dumbo" },
+                    { emoji: "🕷️👨🦸‍♂️", answer: "Spider-Man" }
+                ]
+            },
+            {
+                name: "Sports ⚽",
+                questions: [
+                    { emoji: "⚽️🏃‍♂️🥅", answer: "Soccer/Football" },
+                    { emoji: "🏈🏃‍♂️🏆", answer: "American Football" },
+                    { emoji: "🏀🏃‍♂️⛹️‍♂️", answer: "Basketball" },
+                    { emoji: "⚾️🏃‍♂️💨", answer: "Baseball" },
+                    { emoji: "🎾🏃‍♂️🎾", answer: "Tennis" },
+                    { emoji: "🏊‍♂️💦🏊‍♀️", answer: "Swimming" },
+                    { emoji: "🏃‍♂️🔄🏃‍♀️", answer: "Track & Field" },
+                    { emoji: "🏑🥅⚡️", answer: "Hockey" },
+                    { emoji: "🏸🪽💨", answer: "Badminton" },
+                    { emoji: "🥊👊💥", answer: "Boxing" }
+                ]
+            },
+            {
+                name: "Food & Drinks 🍽️",
+                questions: [
+                    { emoji: "🍕🧀🍅", answer: "Pizza" },
+                    { emoji: "🍔🥩🥬", answer: "Hamburger" },
+                    { emoji: "🍣🐟🥢", answer: "Sushi" },
+                    { emoji: "🌮🧀🥬", answer: "Tacos" },
+                    { emoji: "🍝🍅🧀", answer: "Spaghetti" },
+                    { emoji: "🥤🧊🥤", answer: "Soft Drink" },
+                    { emoji: "☕️🥛💨", answer: "Latte" },
+                    { emoji: "🍦🍫🥜", answer: "Ice Cream Sundae" },
+                    { emoji: "🥪🥓🥬", answer: "Sandwich" },
+                    { emoji: "🍜🥚🥢", answer: "Ramen" }
+                ]
+            },
+            {
+                name: "Famous Places 🗺️",
+                questions: [
+                    { emoji: "🗽🌆🚕", answer: "New York City" },
+                    { emoji: "🗼🍣🎌", answer: "Tokyo" },
+                    { emoji: "🎡🗼🥖", answer: "Paris" },
+                    { emoji: "🏛️🍝🛵", answer: "Rome" },
+                    { emoji: "🎪🐨🦘", answer: "Sydney" },
+                    { emoji: "⛩️🍜🗻", answer: "Kyoto" },
+                    { emoji: "🕌🐪🌴", answer: "Dubai" },
+                    { emoji: "🎭🚌☔️", answer: "London" },
+                    { emoji: "🏺🏛️🫒", answer: "Athens" },
+                    { emoji: "🌉🌁🚊", answer: "San Francisco" }
+                ]
+            },
+            {
+                name: "Books 📚",
+                questions: [
+                    { emoji: "🧙‍♂️⚡️👓", answer: "Harry Potter" },
+                    { emoji: "🕷️👨🕸️", answer: "Charlotte's Web" },
+                    { emoji: "🌲🦁🚪", answer: "The Lion, The Witch and The Wardrobe" },
+                    { emoji: "🎩🫖🐰", answer: "Alice in Wonderland" },
+                    { emoji: "👨‍👦🦁⭐️", answer: "The Little Prince" },
+                    { emoji: "🏃‍♂️💨🎈", answer: "Around the World in 80 Days" },
+                    { emoji: "🐋🚢🌊", answer: "Moby Dick" },
+                    { emoji: "🧑‍🌾🐭📝", answer: "Stuart Little" },
+                    { emoji: "🌳💍🧙‍♂️", answer: "The Hobbit" },
+                    { emoji: "🏃‍♂️🌊🐋", answer: "20,000 Leagues Under the Sea" }
+                ]
+            }
         ];
 
+        let currentCategory = 0;
         let currentQuestion = 0;
 
         function updateDisplay() {
-            document.getElementById('emojiDisplay').textContent = questions[currentQuestion].emoji;
+            const category = categories[currentCategory];
+            document.getElementById('categoryTitle').textContent = category.name;
+            document.getElementById('emojiDisplay').textContent = category.questions[currentQuestion].emoji;
             document.getElementById('answerDisplay').style.display = 'none';
             document.getElementById('progress').textContent = 
-                `Question ${currentQuestion + 1} of ${questions.length}`;
+                `Question ${currentQuestion + 1} of ${category.questions.length}`;
         }
 
         function showAnswer() {
-            document.getElementById('answerDisplay').textContent = questions[currentQuestion].answer;
+            document.getElementById('answerDisplay').textContent = 
+                categories[currentCategory].questions[currentQuestion].answer;
             document.getElementById('answerDisplay').style.display = 'block';
         }
 
         function nextQuestion() {
-            currentQuestion = (currentQuestion + 1) % questions.length;
+            currentQuestion = (currentQuestion + 1) % categories[currentCategory].questions.length;
+            updateDisplay();
+        }
+
+        function nextCategory() {
+            currentCategory = (currentCategory + 1) % categories.length;
+            currentQuestion = 0;
+            updateDisplay();
+        }
+
+        function prevCategory() {
+            currentCategory = (currentCategory - 1 + categories.length) % categories.length;
+            currentQuestion = 0;
             updateDisplay();
         }
 
